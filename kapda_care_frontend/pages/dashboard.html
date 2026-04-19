@@ -1,0 +1,747 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Kapda Care — Dashboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600&display=swap"/>
+<style>
+:root {
+  --green:#1e6b3c; --green-dark:#144d2b; --green-light:#e8f5ee; --green-faint:#f2faf5;
+  --gold:#c9a84c; --gold-light:#fdf6e3;
+  --cream:#faf8f3; --black:#0f1410; --gray:#5a6672; --gray-light:#f0f2f0;
+  --border:#dce8e0; --white:#ffffff; --red:#c0392b; --red-light:#fdf0ee;
+  --blue:#2563eb; --blue-light:#eff6ff;
+  --sidebar-w:268px; --topbar-h:64px;
+  --radius:14px; --radius-sm:8px;
+  --shadow:0 1px 4px rgba(0,0,0,0.06),0 4px 16px rgba(0,0,0,0.04);
+  --shadow-md:0 4px 20px rgba(30,107,60,0.10);
+  --t:all 0.22s cubic-bezier(0.4,0,0.2,1);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'DM Sans',sans-serif;background:var(--cream);color:var(--black);min-height:100vh;display:flex;font-size:14px;-webkit-font-smoothing:antialiased;}
+h1,h2,h3,h4{font-family:'Playfair Display',serif;}
+
+/* SIDEBAR */
+.sidebar{width:var(--sidebar-w);background:var(--black);min-height:100vh;position:fixed;left:0;top:0;display:flex;flex-direction:column;z-index:200;transition:transform .28s ease;}
+.sb-logo{padding:24px 22px 18px;border-bottom:1px solid rgba(255,255,255,0.07);display:flex;align-items:center;gap:11px;}
+.sb-mark{width:38px;height:38px;background:var(--green);border-radius:9px;display:flex;align-items:center;justify-content:center;font-family:'Playfair Display',serif;font-size:15px;font-weight:900;color:#fff;flex-shrink:0;}
+.sb-brand{font-size:16px;font-weight:600;color:#fff;letter-spacing:-0.2px;}
+.sb-tag{font-size:10px;color:rgba(255,255,255,0.35);margin-top:1px;letter-spacing:0.3px;}
+.user-card{margin:13px 15px;padding:12px 13px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);border-radius:var(--radius-sm);display:flex;align-items:center;gap:10px;}
+.u-av{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,var(--green),var(--green-dark));display:flex;align-items:center;justify-content:center;font-family:'Playfair Display',serif;font-size:13px;font-weight:700;color:#fff;flex-shrink:0;}
+.u-name{font-size:13px;font-weight:600;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.u-role{font-size:10px;color:var(--gold);text-transform:uppercase;letter-spacing:0.6px;margin-top:1px;}
+.sb-nav{flex:1;padding:6px 11px;overflow-y:auto;}
+.nav-lbl{font-size:9.5px;font-weight:600;color:rgba(255,255,255,0.28);text-transform:uppercase;letter-spacing:1.4px;padding:13px 8px 5px;}
+.nav-item{display:flex;align-items:center;gap:11px;padding:10px 12px;border-radius:var(--radius-sm);color:rgba(255,255,255,0.55);cursor:pointer;font-size:13.5px;font-weight:500;transition:var(--t);margin-bottom:1px;border:none;background:none;width:100%;text-align:left;}
+.nav-item:hover{background:rgba(255,255,255,0.06);color:rgba(255,255,255,0.9);}
+.nav-item.active{background:var(--green);color:#fff;box-shadow:0 3px 12px rgba(30,107,60,0.4);}
+.ni{width:18px;text-align:center;flex-shrink:0;font-size:15px;}
+.nb{margin-left:auto;background:var(--gold);color:#fff;font-size:10px;font-weight:700;padding:1px 7px;border-radius:20px;}
+.sb-foot{padding:13px 15px;border-top:1px solid rgba(255,255,255,0.07);}
+.logout-btn{width:100%;padding:9px;background:rgba(192,57,43,0.12);border:1px solid rgba(192,57,43,0.25);color:#e88;border-radius:var(--radius-sm);cursor:pointer;font-size:13px;font-weight:600;font-family:'DM Sans',sans-serif;transition:var(--t);display:flex;align-items:center;justify-content:center;gap:7px;}
+.logout-btn:hover{background:rgba(192,57,43,0.22);color:#fff;}
+
+/* MAIN */
+.main{margin-left:var(--sidebar-w);flex:1;min-height:100vh;display:flex;flex-direction:column;}
+.topbar{height:var(--topbar-h);background:var(--white);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 26px;gap:13px;position:sticky;top:0;z-index:50;}
+.tb-title{font-size:16px;font-weight:600;color:var(--black);flex:1;}
+.tb-title span{color:var(--green);font-family:'Playfair Display',serif;font-size:18px;}
+.tb-actions{display:flex;gap:8px;align-items:center;}
+.ib{width:36px;height:36px;border:1.5px solid var(--border);border-radius:var(--radius-sm);background:none;cursor:pointer;font-size:15px;display:flex;align-items:center;justify-content:center;transition:var(--t);position:relative;color:var(--gray);}
+.ib:hover{background:var(--green-light);border-color:var(--green);color:var(--green);}
+.ndot{position:absolute;top:-3px;right:-3px;width:9px;height:9px;background:var(--gold);border-radius:50%;border:2px solid #fff;display:none;}
+.hamburger{display:none;background:none;border:none;font-size:20px;cursor:pointer;color:var(--black);padding:4px;}
+
+.page{padding:26px;flex:1;}
+.section{display:none;} .section.active{display:block;}
+
+.ph{margin-bottom:22px;}
+.pt{font-size:25px;font-weight:900;color:var(--black);margin-bottom:3px;}
+.ps{font-size:13.5px;color:var(--gray);}
+
+/* STATS */
+.stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:15px;margin-bottom:22px;}
+.sc{background:var(--white);border-radius:var(--radius);padding:18px 20px;border:1.5px solid var(--border);box-shadow:var(--shadow);display:flex;align-items:center;gap:13px;transition:var(--t);}
+.sc:hover{transform:translateY(-2px);box-shadow:var(--shadow-md);}
+.si{width:42px;height:42px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:19px;flex-shrink:0;}
+.sig{background:var(--green-light);} .sib{background:var(--blue-light);} .sigo{background:var(--gold-light);} .sir{background:var(--red-light);}
+.sv{font-family:'Playfair Display',serif;font-size:24px;font-weight:900;color:var(--black);line-height:1;}
+.sl{font-size:11.5px;color:var(--gray);margin-top:3px;font-weight:500;}
+
+/* LAYOUT */
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-bottom:18px;}
+.g3{display:grid;grid-template-columns:repeat(3,1fr);gap:15px;margin-bottom:18px;}
+
+/* CARD */
+.card{background:var(--white);border-radius:var(--radius);border:1.5px solid var(--border);box-shadow:var(--shadow);overflow:hidden;margin-bottom:18px;}
+.ch{padding:15px 18px 12px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border);}
+.ct{font-size:14px;font-weight:700;color:var(--black);font-family:'Playfair Display',serif;}
+.cb{padding:18px;}
+
+/* BUTTONS */
+.btn{display:inline-flex;align-items:center;gap:7px;padding:10px 22px;border-radius:50px;font-family:'DM Sans',sans-serif;font-size:13.5px;font-weight:600;cursor:pointer;border:none;transition:var(--t);text-decoration:none;white-space:nowrap;}
+.btn-p{background:var(--green);color:#fff;}
+.btn-p:hover{background:var(--green-dark);transform:translateY(-1px);box-shadow:0 4px 16px rgba(30,107,60,0.3);}
+.btn-o{background:transparent;border:1.5px solid var(--border);color:var(--gray);}
+.btn-o:hover{border-color:var(--green);color:var(--green);background:var(--green-light);}
+.btn-g{background:var(--gold);color:#fff;}
+.btn-g:hover{background:#b8933e;transform:translateY(-1px);}
+.btn-d{background:var(--red);color:#fff;}
+.btn-sm{padding:7px 16px;font-size:12.5px;}
+.btn-full{width:100%;justify-content:center;}
+.btn:disabled{opacity:0.55;cursor:not-allowed;transform:none!important;}
+
+/* FORMS */
+.fg{margin-bottom:15px;}
+.fl{display:block;font-size:11.5px;font-weight:600;color:var(--gray);margin-bottom:6px;text-transform:uppercase;letter-spacing:0.4px;}
+.fc{width:100%;padding:11px 13px;border:1.5px solid var(--border);border-radius:var(--radius-sm);font-family:'DM Sans',sans-serif;font-size:14px;color:var(--black);background:var(--white);transition:var(--t);outline:none;}
+.fc:focus{border-color:var(--green);box-shadow:0 0 0 3px rgba(30,107,60,0.1);}
+select.fc{cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%235a6672' d='M6 8L1 3h10z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 11px center;padding-right:30px;}
+
+/* BADGES */
+.badge{display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;}
+.bp{background:#fef9e7;color:#b7770d;} .bpr{background:#eaf4ff;color:#1a6db0;}
+.bpu{background:#f0eaff;color:#6938a8;} .bd{background:var(--green-light);color:var(--green);} .bc{background:var(--red-light);color:var(--red);}
+
+/* ORDER ROWS */
+.or{display:flex;align-items:center;gap:13px;padding:13px 0;border-bottom:1px solid var(--border);transition:var(--t);}
+.or:last-child{border-bottom:none;padding-bottom:0;}
+.or:hover{background:var(--green-faint);margin:0 -18px;padding:13px 18px;border-radius:var(--radius-sm);}
+.oi{width:38px;height:38px;border-radius:9px;background:var(--green-light);display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0;}
+.on{font-size:14px;font-weight:600;color:var(--black);margin-bottom:2px;}
+.om{font-size:11.5px;color:var(--gray);}
+.oa{font-size:15px;font-weight:700;color:var(--green);white-space:nowrap;}
+
+/* SERVICE TILES */
+.sg{display:grid;grid-template-columns:repeat(3,1fr);gap:11px;}
+.st{border:2px solid var(--border);border-radius:var(--radius);padding:16px 10px;text-align:center;cursor:pointer;transition:var(--t);background:var(--white);}
+.st:hover{border-color:var(--green);background:var(--green-faint);}
+.st.selected{border-color:var(--green);background:var(--green-light);box-shadow:0 0 0 3px rgba(30,107,60,0.12);}
+.sti{font-size:26px;margin-bottom:7px;}
+.stn{font-size:12.5px;font-weight:700;color:var(--black);margin-bottom:3px;}
+.stp{font-size:11.5px;color:var(--green);font-weight:600;}
+
+/* PAYMENT */
+.pg{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;margin-bottom:15px;}
+.po{border:2px solid var(--border);border-radius:var(--radius);padding:13px 9px;text-align:center;cursor:pointer;transition:var(--t);}
+.po:hover,.po.active{border-color:var(--green);background:var(--green-light);}
+.pxi{font-size:20px;margin-bottom:4px;} .pxn{font-size:12px;font-weight:700;color:var(--black);} .pxs{font-size:10.5px;color:var(--gray);}
+
+/* PRICE ROWS */
+.pr{display:flex;justify-content:space-between;font-size:13.5px;padding:7px 0;border-bottom:1px solid var(--border);}
+.pr:last-child{border-bottom:none;font-size:15px;font-weight:700;color:var(--green);padding-top:9px;}
+.disc{color:var(--green);font-weight:600;}
+
+/* PLAN CARDS */
+.plan-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;}
+.plan-card{border:2px solid var(--border);border-radius:var(--radius);padding:26px 20px;position:relative;transition:var(--t);background:var(--white);}
+.plan-card:hover{transform:translateY(-3px);box-shadow:var(--shadow-md);}
+.plan-card.pop{border-color:var(--green);} .plan-card.elite{border-color:var(--gold);}
+.pop-pill{position:absolute;top:-11px;left:50%;transform:translateX(-50%);background:var(--green);color:#fff;padding:3px 15px;border-radius:20px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;white-space:nowrap;}
+.pln{font-family:'Playfair Display',serif;font-size:19px;font-weight:900;margin-bottom:5px;}
+.plp{font-family:'Playfair Display',serif;font-size:32px;font-weight:900;color:var(--green);line-height:1;}
+.plp.gp{color:var(--gold);}
+.plper{font-size:12.5px;color:var(--gray);margin-bottom:16px;}
+.plf{font-size:13px;color:var(--gray);padding:6px 0;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px;}
+.plf:last-of-type{border-bottom:none;}
+.ck{color:var(--green);font-weight:700;} .cx{color:var(--border);font-weight:700;}
+
+/* STEPS */
+.steps-row{display:flex;gap:0;margin-bottom:26px;position:relative;}
+.steps-row::before{content:'';position:absolute;top:14px;left:14%;right:14%;height:2px;background:var(--border);z-index:0;}
+.vstep{flex:1;text-align:center;position:relative;z-index:1;}
+.vn{width:28px;height:28px;border-radius:50%;background:var(--border);color:var(--gray);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;margin:0 auto 6px;}
+.vstep.done .vn{background:var(--green);color:#fff;}
+.vstep.active .vn{background:var(--green);color:#fff;box-shadow:0 0 0 4px rgba(30,107,60,0.18);}
+.vl{font-size:10.5px;color:var(--gray);font-weight:600;}
+
+/* UPLOAD */
+.upload-area{border:2px dashed var(--border);border-radius:var(--radius);padding:32px 20px;text-align:center;cursor:pointer;transition:var(--t);background:var(--gray-light);}
+.upload-area:hover{border-color:var(--green);background:var(--green-faint);}
+
+/* AI */
+.ai-result{background:var(--green-light);border-radius:var(--radius);padding:18px;border:1.5px solid var(--green);display:none;margin-top:15px;}
+
+/* FAQ */
+.faq-item{border:1.5px solid var(--border);border-radius:var(--radius-sm);margin-bottom:9px;overflow:hidden;transition:var(--t);}
+.faq-item:hover,.faq-item.open{border-color:var(--green);}
+.faq-q{padding:13px 15px;cursor:pointer;font-weight:600;font-size:13.5px;display:flex;justify-content:space-between;align-items:center;}
+.faq-a{display:none;padding:0 15px 13px;font-size:13px;color:var(--gray);line-height:1.65;}
+.faq-item.open .faq-a{display:block;}
+.farr{transition:var(--t);}
+.faq-item.open .farr{transform:rotate(180deg);}
+
+/* QUICK ACTIONS */
+.qa{display:flex;align-items:center;gap:12px;padding:12px 15px;border-radius:var(--radius-sm);border:1.5px solid var(--border);background:var(--white);cursor:pointer;transition:var(--t);font-size:13.5px;font-weight:600;color:var(--black);}
+.qa:hover{border-color:var(--green);background:var(--green-faint);color:var(--green);}
+.qai{width:34px;height:34px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:17px;}
+
+/* BANNER */
+.banner{background:linear-gradient(135deg,var(--black) 0%,var(--green-dark) 100%);border-radius:var(--radius);padding:20px 22px;display:flex;align-items:center;justify-content:space-between;gap:15px;flex-wrap:wrap;margin-bottom:18px;}
+.bt .btitle{font-family:'Playfair Display',serif;font-size:18px;font-weight:900;color:#fff;margin-bottom:4px;}
+.bt .bsub{font-size:13px;color:rgba(255,255,255,0.65);}
+
+/* CHATBOT */
+#chatbot-bubble{position:fixed;bottom:22px;right:22px;width:50px;height:50px;border-radius:50%;background:var(--green);box-shadow:0 6px 24px rgba(30,107,60,0.4);display:flex;align-items:center;justify-content:center;cursor:pointer;z-index:999;font-size:20px;transition:var(--t);color:#fff;font-weight:700;}
+#chatbot-bubble:hover{transform:scale(1.08);background:var(--green-dark);}
+#chatbot-window{position:fixed;bottom:84px;right:22px;width:330px;height:450px;background:var(--white);border-radius:18px;box-shadow:0 20px 60px rgba(0,0,0,0.14);z-index:998;display:none;flex-direction:column;overflow:hidden;border:1.5px solid var(--border);}
+#chatbot-window.open{display:flex;}
+.chat-head{background:var(--green);padding:14px 17px;display:flex;align-items:center;gap:10px;}
+.cha{width:32px;height:32px;border-radius:50%;background:rgba(255,255,255,0.18);display:flex;align-items:center;justify-content:center;font-size:15px;}
+.chat-head .chn{font-weight:700;color:#fff;font-size:13.5px;} .chat-head .chs{font-size:10.5px;color:rgba(255,255,255,0.7);}
+.chat-close{margin-left:auto;color:rgba(255,255,255,0.7);cursor:pointer;font-size:17px;line-height:1;}
+.chat-msgs{flex:1;overflow-y:auto;padding:13px;display:flex;flex-direction:column;gap:9px;}
+.msg{max-width:82%;} .msg.bot{align-self:flex-start;} .msg.user{align-self:flex-end;}
+.mb{padding:10px 13px;border-radius:13px;font-size:13px;line-height:1.55;}
+.msg.bot .mb{background:var(--green-light);color:var(--black);border-bottom-left-radius:3px;}
+.msg.user .mb{background:var(--green);color:#fff;border-bottom-right-radius:3px;}
+.mt{font-size:10px;color:var(--gray);margin-top:3px;padding:0 3px;}
+.chat-qr{display:flex;flex-wrap:wrap;gap:5px;margin-top:5px;}
+.qr-btn{padding:4px 10px;border-radius:20px;border:1.5px solid var(--green);color:var(--green);background:none;cursor:pointer;font-size:11.5px;font-family:'DM Sans',sans-serif;font-weight:600;transition:var(--t);}
+.qr-btn:hover{background:var(--green);color:#fff;}
+.chat-ir{border-top:1px solid var(--border);padding:11px;display:flex;gap:8px;align-items:center;}
+.chat-input{flex:1;padding:9px 12px;border:1.5px solid var(--border);border-radius:22px;font-size:13px;font-family:'DM Sans',sans-serif;outline:none;transition:var(--t);}
+.chat-input:focus{border-color:var(--green);}
+.chat-send{width:33px;height:33px;border-radius:50%;background:var(--green);border:none;color:#fff;cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center;transition:var(--t);}
+.chat-send:hover{background:var(--green-dark);}
+
+/* TOAST */
+.toast-wrap{position:fixed;top:17px;right:17px;z-index:9999;display:flex;flex-direction:column;gap:8px;}
+.toast{background:var(--black);color:#fff;padding:11px 17px;border-radius:9px;font-size:13px;display:flex;align-items:center;gap:9px;box-shadow:0 8px 32px rgba(0,0,0,0.15);min-width:230px;animation:tin .28s ease;}
+.toast.success{border-left:4px solid var(--green);} .toast.error{border-left:4px solid var(--red);} .toast.info{border-left:4px solid var(--gold);}
+@keyframes tin{from{transform:translateX(40px);opacity:0;}}
+
+.divider{height:1px;background:var(--border);margin:16px 0;}
+.empty{text-align:center;padding:40px 20px;color:var(--gray);}
+.empty-icon{font-size:40px;margin-bottom:11px;} .empty-title{font-size:14.5px;font-weight:700;color:var(--black);margin-bottom:4px;} .empty-sub{font-size:12.5px;}
+.spinner{width:15px;height:15px;border:2px solid rgba(255,255,255,0.3);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;display:none;}
+@keyframes spin{to{transform:rotate(360deg);}}
+.p-av{width:68px;height:68px;border-radius:50%;background:linear-gradient(135deg,var(--green),var(--green-dark));display:flex;align-items:center;justify-content:center;font-family:'Playfair Display',serif;font-size:26px;font-weight:900;color:#fff;margin:0 auto 13px;}
+
+@media(max-width:960px){
+  .sidebar{transform:translateX(-100%);} .sidebar.open{transform:translateX(0);}
+  .main{margin-left:0;} .hamburger{display:block;}
+  .stats-row{grid-template-columns:repeat(2,1fr);} .g2,.plan-grid{grid-template-columns:1fr;}
+  .sg{grid-template-columns:repeat(2,1fr);} .pg{grid-template-columns:repeat(3,1fr);}
+}
+</style>
+</head>
+<body>
+
+<aside class="sidebar" id="sidebar">
+  <div class="sb-logo">
+    <div class="sb-mark">KC</div>
+    <div><div class="sb-brand">Kapda Care</div><div class="sb-tag">Every Thread Tells a Story</div></div>
+  </div>
+  <div class="user-card">
+    <div class="u-av" id="sidebarAvatar">?</div>
+    <div style="min-width:0"><div class="u-name" id="sidebarName">Loading…</div><div class="u-role" id="sidebarRole">Customer</div></div>
+  </div>
+  <nav class="sb-nav">
+    <div class="nav-lbl">Main</div>
+    <button class="nav-item active" onclick="showSection('home')"><span class="ni">⌂</span> Dashboard</button>
+    <button class="nav-item" onclick="showSection('place-order')"><span class="ni">＋</span> Place Order</button>
+    <button class="nav-item" onclick="showSection('my-orders')"><span class="ni">▣</span> My Orders <span class="nb" id="ordersBadge" style="display:none">0</span></button>
+    <div class="nav-lbl">Features</div>
+    <button class="nav-item" onclick="showSection('membership')"><span class="ni">◈</span> Membership Plans</button>
+    <button class="nav-item" onclick="showSection('student-verify')"><span class="ni">✦</span> Student Discount</button>
+    <button class="nav-item" onclick="showSection('vastra-ai')"><span class="ni">✧</span> Vastra AI</button>
+    <div class="nav-lbl">Account</div>
+    <button class="nav-item" onclick="showSection('profile')"><span class="ni">◉</span> Profile</button>
+  </nav>
+  <div class="sb-foot">
+    <button class="logout-btn" onclick="logout()"><span>←</span> Sign Out</button>
+  </div>
+</aside>
+
+<main class="main">
+  <div class="topbar">
+    <button class="hamburger" onclick="document.getElementById('sidebar').classList.toggle('open')">☰</button>
+    <div class="tb-title" id="topbarTitle">Dashboard <span>Overview</span></div>
+    <div class="tb-actions">
+      <button class="ib" onclick="showSection('my-orders')">▣<div class="ndot" id="notifDot"></div></button>
+      <button class="ib" onclick="showSection('place-order')">＋</button>
+    </div>
+  </div>
+
+  <div class="page">
+
+    <!-- HOME -->
+    <section class="section active" id="sec-home">
+      <div class="ph"><div class="pt" id="homeTitle">Good morning!</div><div class="ps" id="homeSub">Here's your wardrobe dashboard.</div></div>
+      <div class="stats-row">
+        <div class="sc"><div class="si sig">▣</div><div><div class="sv" id="statTotal">0</div><div class="sl">Total Orders</div></div></div>
+        <div class="sc"><div class="si sib">↻</div><div><div class="sv" id="statActive">0</div><div class="sl">In Progress</div></div></div>
+        <div class="sc"><div class="si sigo">◈</div><div><div class="sv" id="statPlan">Free</div><div class="sl">Membership</div></div></div>
+        <div class="sc"><div class="si sig">✦</div><div><div class="sv" id="statStudent">—</div><div class="sl">Student Status</div></div></div>
+      </div>
+      <div class="g2">
+        <div class="card">
+          <div class="ch"><div class="ct">Quick Actions</div></div>
+          <div class="cb" style="display:flex;flex-direction:column;gap:9px">
+            <div class="qa" onclick="showSection('place-order')"><div class="qai" style="background:var(--green-light)">＋</div><div><div>Place New Order</div><div style="font-size:11.5px;color:var(--gray);font-weight:400;margin-top:1px">Laundry, tailoring, dry clean</div></div></div>
+            <div class="qa" onclick="showSection('my-orders')"><div class="qai" style="background:var(--blue-light)">▣</div><div><div>Track My Orders</div><div style="font-size:11.5px;color:var(--gray);font-weight:400;margin-top:1px">Real-time status updates</div></div></div>
+            <div class="qa" onclick="showSection('membership')"><div class="qai" style="background:var(--gold-light)">◈</div><div><div>Upgrade Membership</div><div style="font-size:11.5px;color:var(--gray);font-weight:400;margin-top:1px">Save up to 20% on every order</div></div></div>
+            <div class="qa" onclick="showSection('vastra-ai')"><div class="qai" style="background:var(--green-light)">✧</div><div><div>Vastra AI Assistant</div><div style="font-size:11.5px;color:var(--gray);font-weight:400;margin-top:1px">Stain detection &amp; fabric advice</div></div></div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="ch"><div class="ct">Recent Orders</div><button class="btn btn-o btn-sm" onclick="showSection('my-orders')">View All</button></div>
+          <div class="cb" id="recentOrdersHome">
+            <div class="empty"><div class="empty-icon">▣</div><div class="empty-title">No orders yet</div><div class="empty-sub">Place your first order to get started!</div></div>
+          </div>
+        </div>
+      </div>
+      <div class="banner">
+        <div class="bt"><div class="btitle">Student? Unlock 15% Off — Always.</div><div class="bsub">Verify your college ID once. Discount applies automatically on every future order.</div></div>
+        <button class="btn btn-g" onclick="showSection('student-verify')">Verify Now →</button>
+      </div>
+    </section>
+
+    <!-- PLACE ORDER -->
+    <section class="section" id="sec-place-order">
+      <div class="ph"><div class="pt">Place New Order</div><div class="ps">Select services, enter details, and pay securely.</div></div>
+      <div class="g2">
+        <div>
+          <div class="card">
+            <div class="ch"><div class="ct">Step 1 — Select Services</div></div>
+            <div class="cb">
+              <div class="sg">
+                <div class="st" data-service="Wash &amp; Fold" data-price="40" onclick="toggleService(this)"><div class="sti">◎</div><div class="stn">Wash &amp; Fold</div><div class="stp">₹40/kg</div></div>
+                <div class="st" data-service="Wash &amp; Iron" data-price="55" onclick="toggleService(this)"><div class="sti">⊟</div><div class="stn">Wash &amp; Iron</div><div class="stp">₹55/kg</div></div>
+                <div class="st" data-service="Dry Clean" data-price="120" onclick="toggleService(this)"><div class="sti">◇</div><div class="stn">Dry Clean</div><div class="stp">₹120/piece</div></div>
+                <div class="st" data-service="Heritage Care" data-price="200" onclick="toggleService(this)"><div class="sti">✦</div><div class="stn">Heritage Care</div><div class="stp">₹200/piece</div></div>
+                <div class="st" data-service="Shoe Cleaning" data-price="80" onclick="toggleService(this)"><div class="sti">▣</div><div class="stn">Shoe Cleaning</div><div class="stp">₹80/pair</div></div>
+                <div class="st" data-service="Steam Iron" data-price="15" onclick="toggleService(this)"><div class="sti">≋</div><div class="stn">Steam Iron</div><div class="stp">₹15/piece</div></div>
+              </div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="ch"><div class="ct">Step 2 — Pickup Details</div></div>
+            <div class="cb">
+              <div class="fg"><label class="fl">Pickup Address</label><textarea class="fc" id="orderAddress" rows="2" placeholder="Flat, building, street, city…"></textarea></div>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:11px">
+                <div class="fg"><label class="fl">Pickup Date</label><input type="date" class="fc" id="pickupDate"/></div>
+                <div class="fg"><label class="fl">Time Slot</label>
+                  <select class="fc" id="pickupSlot">
+                    <option>8:00 – 10:00 AM</option><option>10:00 AM – 12:00 PM</option>
+                    <option>12:00 – 2:00 PM</option><option>2:00 – 4:00 PM</option>
+                    <option>4:00 – 6:00 PM</option><option>6:00 – 8:00 PM</option>
+                  </select>
+                </div>
+              </div>
+              <div class="fg"><label class="fl">Weight / Quantity</label><input type="number" class="fc" id="orderWeight" placeholder="e.g. 3 kg or pieces" min="1" value="1"/></div>
+              <div class="fg"><label class="fl">Special Instructions</label><textarea class="fc" id="orderNotes" rows="2" placeholder="Delicate fabric, stain on collar, etc."></textarea></div>
+            </div>
+          </div>
+        </div>
+        <div>
+          <div class="card" style="position:sticky;top:76px">
+            <div class="ch"><div class="ct">Order Summary</div></div>
+            <div class="cb">
+              <div id="selectedServicesDisplay">
+                <div class="empty" style="padding:26px"><div class="empty-icon" style="font-size:34px">↖</div><div class="empty-title">Select a service</div><div class="empty-sub">to see your order summary</div></div>
+              </div>
+              <div id="pricingBreakdown" style="display:none">
+                <div class="divider"></div>
+                <div id="priceRows"></div>
+                <div class="divider"></div>
+                <div style="margin-bottom:14px">
+                  <div class="fl" style="margin-bottom:9px">Payment Method</div>
+                  <div class="pg">
+                    <div class="po active" id="payRazorpay" onclick="selectPayment('razorpay')"><div class="pxi">◻</div><div class="pxn">Razorpay</div><div class="pxs">Cards / Net</div></div>
+                    <div class="po" id="payUPI" onclick="selectPayment('upi')"><div class="pxi">◈</div><div class="pxn">UPI</div><div class="pxs">GPay / PhonePe</div></div>
+                    <div class="po" id="payCOD" onclick="selectPayment('cod')"><div class="pxi">◇</div><div class="pxn">Cash</div><div class="pxs">Pay on pickup</div></div>
+                  </div>
+                  <div id="upiSection" style="display:none;margin-top:9px"><div class="fg"><label class="fl">UPI ID</label><input class="fc" id="upiId" placeholder="yourname@upi"/></div></div>
+                </div>
+                <button class="btn btn-p btn-full" onclick="placeOrder()" id="placeOrderBtn" style="padding:13px">
+                  <span id="pot">Place Order</span><div class="spinner" id="orderLoader"></div>
+                </button>
+                <p style="font-size:11px;color:var(--gray);text-align:center;margin-top:9px">Secure payment · Free pickup &amp; delivery</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- MY ORDERS -->
+    <section class="section" id="sec-my-orders">
+      <div class="ph"><div class="pt">My Orders</div><div class="ps">Track all your laundry and tailoring orders in real-time.</div></div>
+      <div class="card">
+        <div class="ch">
+          <div class="ct">Order History</div>
+          <div style="display:flex;gap:8px">
+            <select class="fc" style="width:auto;padding:6px 11px;font-size:12.5px" id="orderFilter" onchange="filterOrders()">
+              <option value="">All Status</option><option value="pending">Pending</option>
+              <option value="processing">Processing</option><option value="pickup">Out for Pickup</option><option value="delivered">Delivered</option>
+            </select>
+            <button class="btn btn-o btn-sm" onclick="loadOrders()">↻ Refresh</button>
+          </div>
+        </div>
+        <div class="cb" id="ordersListContainer">
+          <div class="empty"><div class="empty-icon">▣</div><div class="empty-title">Loading orders…</div></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- MEMBERSHIP -->
+    <section class="section" id="sec-membership">
+      <div class="ph"><div class="pt">Membership Plans</div><div class="ps">Upgrade for exclusive discounts, priority service, and special perks.</div></div>
+      <div class="plan-grid" style="margin-bottom:26px">
+        <div class="plan-card">
+          <div class="pln">Free</div><div class="plp">₹0</div><div class="plper">/month · No commitment</div>
+          <div class="plf"><span class="ck">✓</span> 5 orders per month</div>
+          <div class="plf"><span class="ck">✓</span> Standard pickup slots</div>
+          <div class="plf"><span class="ck">✓</span> Basic order tracking</div>
+          <div class="plf"><span class="cx">—</span> No discount</div>
+          <div class="plf"><span class="cx">—</span> No priority support</div>
+          <div style="margin-top:18px"><button class="btn btn-o btn-full" disabled>Current Plan</button></div>
+        </div>
+        <div class="plan-card pop">
+          <div class="pop-pill">Most Popular</div>
+          <div class="pln">Silver</div><div class="plp">₹199</div><div class="plper">/month · Billed monthly</div>
+          <div class="plf"><span class="ck">✓</span> Unlimited orders</div>
+          <div class="plf"><span class="ck">✓</span> 10% off every order</div>
+          <div class="plf"><span class="ck">✓</span> Priority pickup slots</div>
+          <div class="plf"><span class="ck">✓</span> WhatsApp tracking</div>
+          <div class="plf"><span class="cx">—</span> Heritage Care not included</div>
+          <div style="margin-top:18px"><button class="btn btn-p btn-full" onclick="subscribePlan('Silver',199)">Subscribe — ₹199/mo</button></div>
+        </div>
+        <div class="plan-card elite">
+          <div class="pln">Gold</div><div class="plp gp">₹399</div><div class="plper">/month · Best value</div>
+          <div class="plf"><span class="ck">✓</span> Unlimited orders</div>
+          <div class="plf"><span class="ck">✓</span> 20% off every order</div>
+          <div class="plf"><span class="ck">✓</span> Free Heritage Care</div>
+          <div class="plf"><span class="ck">✓</span> Dedicated account manager</div>
+          <div class="plf"><span class="ck">✓</span> Shoe cleaning included</div>
+          <div style="margin-top:18px"><button class="btn btn-g btn-full" onclick="subscribePlan('Gold',399)">Subscribe — ₹399/mo</button></div>
+        </div>
+      </div>
+      <div class="card" id="membershipPayBlock" style="display:none;max-width:440px;margin:0 auto">
+        <div class="ch"><div class="ct" id="membershipPayTitle">Subscribe to Plan</div></div>
+        <div class="cb">
+          <div class="pg" style="margin-bottom:13px">
+            <div class="po active" id="memPayRzp" onclick="selectMemPayment('razorpay')"><div class="pxi">◻</div><div class="pxn">Razorpay</div></div>
+            <div class="po" id="memPayUPI" onclick="selectMemPayment('upi')"><div class="pxi">◈</div><div class="pxn">UPI</div></div>
+          </div>
+          <div id="memUpiRow" style="display:none;margin-bottom:13px"><input class="fc" id="memUpiId" placeholder="yourname@upi"/></div>
+          <button class="btn btn-p btn-full" onclick="confirmMembership()" style="padding:13px">Confirm &amp; Pay <span id="memPayAmt"></span></button>
+          <button class="btn btn-o btn-full" style="margin-top:8px" onclick="cancelMembershipPay()">Cancel</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- STUDENT VERIFY -->
+    <section class="section" id="sec-student-verify">
+      <div class="ph"><div class="pt">Student Verification</div><div class="ps">Verify your student status once. Get 15% off every order, forever.</div></div>
+      <div style="max-width:520px;margin:0 auto">
+        <div class="banner" style="margin-bottom:22px">
+          <div class="bt"><div class="btitle">15% Off — Every Single Order</div><div class="bsub">One-time verification. Permanent discount. No renewal needed.</div></div>
+          <div style="font-family:'Playfair Display',serif;font-size:30px;font-weight:900;color:var(--gold);white-space:nowrap">15%</div>
+        </div>
+        <div class="card">
+          <div class="cb">
+            <div class="steps-row">
+              <div class="vstep active" id="vstep1"><div class="vn">1</div><div class="vl">College Info</div></div>
+              <div class="vstep" id="vstep2"><div class="vn">2</div><div class="vl">Upload ID</div></div>
+              <div class="vstep" id="vstep3"><div class="vn">3</div><div class="vl">Done</div></div>
+            </div>
+            <div id="verifyStep1">
+              <div class="fg"><label class="fl">College / University</label><input type="text" class="fc" id="collegeName" placeholder="e.g. NIT Tiruchirappalli, IIT Delhi, DU"/></div>
+              <div class="fg"><label class="fl">Roll Number / Student ID</label><input type="text" class="fc" id="rollNumber" placeholder="e.g. 2021CSE001"/></div>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:11px">
+                <div class="fg"><label class="fl">Course</label><input type="text" class="fc" id="courseName" placeholder="B.Tech, MBA…"/></div>
+                <div class="fg"><label class="fl">Year</label>
+                  <select class="fc" id="studyYear"><option>1st Year</option><option>2nd Year</option><option>3rd Year</option><option>4th Year</option><option>PG / PhD</option></select>
+                </div>
+              </div>
+              <button class="btn btn-p btn-full" onclick="goVerifyStep2()" style="padding:13px">Continue →</button>
+            </div>
+            <div id="verifyStep2" style="display:none">
+              <div class="upload-area" onclick="document.getElementById('idFileInput').click()">
+                <div style="font-size:34px;margin-bottom:9px">▣</div>
+                <div style="font-weight:700;font-size:14px;margin-bottom:4px">Upload College ID Card</div>
+                <div style="font-size:12.5px;color:var(--gray)">Click to browse — JPG, PNG or PDF · Max 5MB</div>
+                <input type="file" id="idFileInput" accept="image/*,.pdf" style="display:none" onchange="handleIDUpload(this)"/>
+              </div>
+              <div id="idPreview" style="display:none;margin:11px 0">
+                <span style="background:var(--green-light);color:var(--green);padding:5px 12px;border-radius:20px;font-size:12px;font-weight:600">▣ Ready: <span id="idFileName"></span></span>
+              </div>
+              <button class="btn btn-p btn-full" onclick="submitVerification()" style="padding:13px;margin-top:4px">
+                <span>Submit for Verification</span><div class="spinner" id="verifyLoader"></div>
+              </button>
+              <button class="btn btn-o btn-full" style="margin-top:8px" onclick="backToVerifyStep1()">← Back</button>
+            </div>
+            <div id="verifyStep3" style="display:none;text-align:center;padding:22px 0">
+              <div style="font-size:48px;margin-bottom:13px">✦</div>
+              <div style="font-family:'Playfair Display',serif;font-size:22px;font-weight:900;color:var(--green);margin-bottom:8px">Verification Submitted!</div>
+              <p style="color:var(--gray);font-size:13.5px;margin-bottom:18px">We'll review your ID within 24 hours and notify you via WhatsApp once approved.</p>
+              <div style="background:var(--green-light);border-radius:var(--radius);padding:17px">
+                <div style="font-family:'Playfair Display',serif;font-size:28px;font-weight:900;color:var(--green)">15% OFF</div>
+                <div style="font-size:12.5px;color:var(--gray);margin-top:3px">Applied to all future orders after approval</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- VASTRA AI -->
+    <section class="section" id="sec-vastra-ai">
+      <div class="ph"><div class="pt">Vastra AI</div><div class="ps">Your intelligent fabric care assistant — powered by artificial intelligence.</div></div>
+      <div class="g2">
+        <div class="card">
+          <div class="ch"><div class="ct">Stain Analyzer</div></div>
+          <div class="cb">
+            <p style="color:var(--gray);font-size:13px;margin-bottom:15px;line-height:1.6">Upload a photo of the stained garment. Vastra AI will identify the stain type and recommend the best treatment method.</p>
+            <div class="upload-area" onclick="document.getElementById('stainInput').click()">
+              <div style="font-size:34px;margin-bottom:9px">◎</div>
+              <div style="font-weight:700;font-size:14px;margin-bottom:4px">Upload stain photo</div>
+              <div style="font-size:12.5px;color:var(--gray)">JPG or PNG — click to browse</div>
+              <input type="file" id="stainInput" accept="image/*" style="display:none" onchange="analyzeStain(this)"/>
+            </div>
+            <div class="ai-result" id="stainResult"></div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="ch"><div class="ct">Fabric Care FAQ</div></div>
+          <div class="cb">
+            <div class="faq-item" onclick="toggleFAQ(this)">
+              <div class="faq-q">How to care for silk sarees? <span class="farr">▾</span></div>
+              <div class="faq-a">Silk sarees should only be dry-cleaned or hand-washed in cold water with pH-neutral soap. Never wring or tumble dry. Store in muslin cloth away from sunlight. Our Heritage Care uses exactly this process.</div>
+            </div>
+            <div class="faq-item" onclick="toggleFAQ(this)">
+              <div class="faq-q">Remove curry stains from cotton? <span class="farr">▾</span></div>
+              <div class="faq-a">Act fast — rinse with cold water, apply dish soap with baking soda paste, let sit 15 minutes. Wash in warm water. For stubborn stains, our enzyme-based Wash &amp; Care pre-treatment is highly effective.</div>
+            </div>
+            <div class="faq-item" onclick="toggleFAQ(this)">
+              <div class="faq-q">How often to dry-clean a suit? <span class="farr">▾</span></div>
+              <div class="faq-a">No more than 2–3 times per year — over-cleaning weakens fibres. Between cleans, use a garment brush and steam iron. Silver &amp; Gold members get quarterly suit care at no extra cost.</div>
+            </div>
+            <div class="faq-item" onclick="toggleFAQ(this)">
+              <div class="faq-q">What is Heritage Care? <span class="farr">▾</span></div>
+              <div class="faq-a">Heritage Care is our premium manual service for heirloom fabrics — Banarasi sarees, embroidered sherwanis, vintage pieces. Hand-washed with soft water and pH-balanced detergent, then air-dried in shade. No machines ever touch these garments.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- PROFILE -->
+    <section class="section" id="sec-profile">
+      <div class="ph"><div class="pt">My Profile</div><div class="ps">Manage your account information.</div></div>
+      <div class="card" style="max-width:480px">
+        <div class="cb">
+          <div style="text-align:center;margin-bottom:24px">
+            <div class="p-av" id="profileAvatar">?</div>
+            <div style="font-family:'Playfair Display',serif;font-size:21px;font-weight:900" id="profileName">—</div>
+            <div style="color:var(--gray);font-size:12.5px;margin-top:2px" id="profileEmail">—</div>
+          </div>
+          <div class="fg"><label class="fl">Full Name</label><input type="text" class="fc" id="editName"/></div>
+          <div class="fg"><label class="fl">Phone Number</label><input type="text" class="fc" id="editPhone" placeholder="+91 XXXXX XXXXX"/></div>
+          <div class="fg"><label class="fl">Default Pickup Address</label><textarea class="fc" id="editAddress" rows="2" placeholder="Your home address…"></textarea></div>
+          <button class="btn btn-p btn-full" onclick="updateProfile()" style="padding:13px">Save Changes</button>
+          <button class="btn btn-d btn-full" style="margin-top:9px;padding:13px" onclick="logout()">Sign Out</button>
+        </div>
+      </div>
+    </section>
+
+  </div>
+</main>
+
+<div id="chatbot-bubble" onclick="toggleChat()" title="Ask Vastra AI">✧</div>
+<div id="chatbot-window">
+  <div class="chat-head">
+    <div class="cha">✧</div>
+    <div><div class="chn">Vastra AI</div><div class="chs">Online — Fabric Care Expert</div></div>
+    <div class="chat-close" onclick="toggleChat()">✕</div>
+  </div>
+  <div class="chat-msgs" id="chatMessages"></div>
+  <div class="chat-ir">
+    <input class="chat-input" id="chatInput" placeholder="Ask about care, pricing, orders…" onkeydown="if(event.key==='Enter')sendChat()"/>
+    <button class="chat-send" onclick="sendChat()">→</button>
+  </div>
+</div>
+
+<div class="toast-wrap" id="toastContainer"></div>
+
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+<script src="../js/api.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  if (!getToken()) { window.location.href = 'login.html'; return; }
+  const u = getUser();
+  if (u && ['vendor','admin'].includes(u.role)) { window.location.href = 'vendor-dashboard.html'; return; }
+  loadUserData(); loadOrders(); initChat();
+  const d = document.getElementById('pickupDate');
+  if (d) { const t = new Date(); t.setDate(t.getDate()+1); d.min = t.toISOString().split('T')[0]; d.value = t.toISOString().split('T')[0]; }
+});
+
+function toast(msg, type='success') {
+  const icons = {success:'✓',error:'✕',info:'i'};
+  const el = document.createElement('div');
+  el.className = 'toast '+type;
+  el.innerHTML = `<span>${icons[type]}</span> ${msg}`;
+  document.getElementById('toastContainer').appendChild(el);
+  setTimeout(() => el.remove(), 3500);
+}
+
+const titles = {
+  'home':'Dashboard <span>Overview</span>','place-order':'Place <span>Order</span>',
+  'my-orders':'My <span>Orders</span>','membership':'Membership <span>Plans</span>',
+  'student-verify':'Student <span>Discount</span>','vastra-ai':'Vastra <span>AI</span>','profile':'My <span>Profile</span>'
+};
+function showSection(id) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  const s = document.getElementById('sec-'+id); if (s) s.classList.add('active');
+  document.querySelectorAll('.nav-item').forEach(n => { if (n.getAttribute('onclick')&&n.getAttribute('onclick').includes("'"+id+"'")) n.classList.add('active'); });
+  document.getElementById('topbarTitle').innerHTML = titles[id]||id;
+  if (id==='my-orders') loadOrders();
+  if (id==='profile')   loadProfileData();
+  if (window.innerWidth<960) document.getElementById('sidebar').classList.remove('open');
+}
+
+async function loadUserData() {
+  try {
+    const u = await Auth.profile();
+    const name = u.username||u.name||'User';
+    document.getElementById('sidebarName').textContent = name;
+    document.getElementById('sidebarRole').textContent = u.role||'Customer';
+    document.getElementById('sidebarAvatar').textContent = name[0].toUpperCase();
+    const hr = new Date().getHours();
+    const gr = hr<12?'Good morning':hr<17?'Good afternoon':'Good evening';
+    document.getElementById('homeTitle').textContent = `${gr}, ${name.split(' ')[0]}!`;
+    document.getElementById('homeSub').textContent = "Here's your wardrobe dashboard for today.";
+    document.getElementById('statPlan').textContent = u.membership||'Free';
+    document.getElementById('statStudent').textContent = u.student_verified?'Verified ✦':'Not verified';
+    localStorage.setItem('kc_user', JSON.stringify(u));
+  } catch(e) {}
+}
+
+let allOrders = [];
+async function loadOrders() {
+  try {
+    const orders = await Orders.my(); allOrders = orders||[];
+    document.getElementById('statTotal').textContent = allOrders.length;
+    const active = allOrders.filter(o=>!['delivered','cancelled'].includes((o.status||'').toLowerCase())).length;
+    document.getElementById('statActive').textContent = active;
+    if (active>0) { document.getElementById('notifDot').style.display='block'; document.getElementById('ordersBadge').style.display='inline'; document.getElementById('ordersBadge').textContent=active; }
+    renderOrders(allOrders); renderHomeRecent(allOrders.slice(0,3));
+  } catch(e) {}
+}
+
+function renderHomeRecent(orders) {
+  const el = document.getElementById('recentOrdersHome');
+  if (!orders.length) { el.innerHTML='<div class="empty"><div class="empty-icon">▣</div><div class="empty-title">No orders yet</div><div class="empty-sub">Place your first order!</div></div>'; return; }
+  el.innerHTML = orders.map(orderRowHTML).join('');
+}
+function renderOrders(orders) {
+  const el = document.getElementById('ordersListContainer');
+  const f = document.getElementById('orderFilter')?.value.toLowerCase();
+  const fil = f ? orders.filter(o=>(o.status||'').toLowerCase()===f) : orders;
+  if (!fil.length) { el.innerHTML='<div class="empty"><div class="empty-icon">▣</div><div class="empty-title">No orders found</div></div>'; return; }
+  el.innerHTML = fil.map(orderRowHTML).join('');
+}
+function orderRowHTML(o) {
+  const sc = {pending:'bp',processing:'bpr',delivered:'bd',cancelled:'bc',pickup:'bpu'};
+  const svc = o.service_type||o.services||'Laundry';
+  const st = (o.status||'pending').toLowerCase();
+  return `<div class="or"><div class="oi">◎</div><div style="flex:1"><div class="on">${svc}</div><div class="om">Order #${o.id||'—'} · ${o.pickup_date||'Scheduled'} · ₹${o.total_price||o.final_price||'—'}</div></div><span class="badge ${sc[st]||'bp'}">${st}</span></div>`;
+}
+function filterOrders() { renderOrders(allOrders); }
+
+let selectedServices = [];
+function toggleService(el) {
+  el.classList.toggle('selected');
+  const svc=el.dataset.service, price=parseInt(el.dataset.price);
+  const idx=selectedServices.findIndex(s=>s.name===svc);
+  if(idx>-1) selectedServices.splice(idx,1); else selectedServices.push({name:svc,price});
+  updateSummary();
+}
+function updateSummary() {
+  const dis=document.getElementById('selectedServicesDisplay'),pr=document.getElementById('pricingBreakdown'),rows=document.getElementById('priceRows');
+  if (!selectedServices.length) { dis.innerHTML='<div class="empty" style="padding:26px"><div class="empty-icon" style="font-size:32px">↖</div><div class="empty-title">Select a service</div><div class="empty-sub">to see your order summary</div></div>'; pr.style.display='none'; return; }
+  const w=parseInt(document.getElementById('orderWeight')?.value)||1;
+  const u=JSON.parse(localStorage.getItem('kc_user')||'{}');
+  let sub=selectedServices.reduce((s,sv)=>s+sv.price*w,0);
+  const disc=u.student_verified?Math.round(sub*0.15):0;
+  const total=sub-disc;
+  dis.innerHTML=selectedServices.map(sv=>`<div class="pr"><span>${sv.name}</span><span>₹${sv.price} × ${w}</span></div>`).join('');
+  rows.innerHTML=`<div class="pr"><span style="color:var(--gray)">Subtotal</span><span>₹${sub}</span></div>${disc?`<div class="pr"><span style="color:var(--gray)">Student Discount (15%)</span><span class="disc">−₹${disc}</span></div>`:''}<div class="pr"><span style="color:var(--gray)">Delivery</span><span style="color:var(--green)">FREE</span></div><div class="pr"><span>Total</span><span>₹${total}</span></div>`;
+  pr.style.display='block';
+}
+document.addEventListener('input', e => { if(e.target.id==='orderWeight') updateSummary(); });
+
+let selectedPayment='razorpay';
+function selectPayment(m) {
+  selectedPayment=m;
+  ['razorpay','upi','cod'].forEach(p=>document.getElementById('pay'+p.charAt(0).toUpperCase()+p.slice(1))?.classList.remove('active'));
+  const map={razorpay:'payRazorpay',upi:'payUPI',cod:'payCOD'};
+  document.getElementById(map[m])?.classList.add('active');
+  document.getElementById('upiSection').style.display=m==='upi'?'block':'none';
+}
+
+async function placeOrder() {
+  if(!selectedServices.length){toast('Please select at least one service.','error');return;}
+  const addr=document.getElementById('orderAddress').value.trim();
+  if(!addr){toast('Please enter your pickup address.','error');return;}
+  const w=parseInt(document.getElementById('orderWeight').value)||1;
+  const u=JSON.parse(localStorage.getItem('kc_user')||'{}');
+  const sub=selectedServices.reduce((s,sv)=>s+sv.price*w,0);
+  const disc=u.student_verified?Math.round(sub*0.15):0;
+  const total=sub-disc;
+  const btn=document.getElementById('placeOrderBtn');
+  const loader=document.getElementById('orderLoader');
+  document.getElementById('pot').textContent='Processing…'; loader.style.display='inline-block'; btn.disabled=true;
+  if(selectedPayment==='razorpay') {
+    const options={key:'rzp_test_YOUR_KEY_HERE',amount:total*100,currency:'INR',name:'Kapda Care',description:selectedServices.map(s=>s.name).join(', '),
+      handler:async(response)=>{await saveOrder(addr,w,total,'paid',response.razorpay_payment_id);},
+      prefill:{name:u.username,email:u.email},theme:{color:'#1e6b3c'}};
+    const rzp=new Razorpay(options); rzp.open();
+    document.getElementById('pot').textContent='Place Order'; loader.style.display='none'; btn.disabled=false;
+  } else { await saveOrder(addr,w,total,selectedPayment==='cod'?'cod':'upi_pending',null); document.getElementById('pot').textContent='Place Order'; loader.style.display='none'; btn.disabled=false; }
+}
+
+async function saveOrder(addr,weight,total,payStatus,payRef) {
+  try {
+    const data=await Orders.place({service_type:selectedServices.map(s=>s.name).join(', '),services:selectedServices,pickup_address:addr,pickup_date:document.getElementById('pickupDate').value,pickup_slot:document.getElementById('pickupSlot').value,weight,total_price:total,items:selectedServices.map(s=>({type:s.name.toLowerCase().replace(/ /g,'_'),service:'wash',quantity:weight})),payment_status:payStatus,payment_ref:payRef});
+    if(data){toast('Order placed successfully!','success');selectedServices=[];document.querySelectorAll('.st.selected').forEach(t=>t.classList.remove('selected'));updateSummary();loadOrders();setTimeout(()=>showSection('my-orders'),1200);}
+  } catch(e){toast(e.message||'Order failed.','error');}
+}
+
+let pendingPlan=null,memPay='razorpay';
+function subscribePlan(plan,price){pendingPlan={plan,price};document.getElementById('membershipPayTitle').textContent=`Subscribe to ${plan} Plan`;document.getElementById('memPayAmt').textContent=` — ₹${price}`;document.getElementById('membershipPayBlock').style.display='block';document.getElementById('membershipPayBlock').scrollIntoView({behavior:'smooth'});}
+function cancelMembershipPay(){document.getElementById('membershipPayBlock').style.display='none';pendingPlan=null;}
+function selectMemPayment(m){memPay=m;document.getElementById('memPayRzp').classList.toggle('active',m==='razorpay');document.getElementById('memPayUPI').classList.toggle('active',m==='upi');document.getElementById('memUpiRow').style.display=m==='upi'?'block':'none';}
+async function confirmMembership(){if(!pendingPlan)return;toast(`${pendingPlan.plan} membership activated!`,'success');document.getElementById('statPlan').textContent=pendingPlan.plan;document.getElementById('membershipPayBlock').style.display='none';const u=JSON.parse(localStorage.getItem('kc_user')||'{}');u.membership=pendingPlan.plan;localStorage.setItem('kc_user',JSON.stringify(u));pendingPlan=null;}
+
+function goVerifyStep2(){if(!document.getElementById('collegeName').value.trim()||!document.getElementById('rollNumber').value.trim()){toast('Please fill in all college details.','error');return;}document.getElementById('verifyStep1').style.display='none';document.getElementById('verifyStep2').style.display='block';document.getElementById('vstep1').classList.add('done');document.getElementById('vstep2').classList.add('active');}
+function backToVerifyStep1(){document.getElementById('verifyStep2').style.display='none';document.getElementById('verifyStep1').style.display='block';document.getElementById('vstep2').classList.remove('active');}
+function handleIDUpload(input){if(input.files[0]){document.getElementById('idPreview').style.display='block';document.getElementById('idFileName').textContent=input.files[0].name;}}
+async function submitVerification(){const loader=document.getElementById('verifyLoader');loader.style.display='inline-block';await new Promise(r=>setTimeout(r,1500));loader.style.display='none';document.getElementById('verifyStep2').style.display='none';document.getElementById('verifyStep3').style.display='block';document.getElementById('vstep2').classList.add('done');document.getElementById('vstep3').classList.add('active','done');toast('Student verification submitted! Review within 24 hours.','success');}
+
+function analyzeStain(input){if(!input.files[0])return;const res=document.getElementById('stainResult');res.style.display='block';res.innerHTML='<div style="font-weight:600;font-size:14px">Analyzing stain…</div><div style="font-size:12.5px;color:var(--gray);margin-top:4px">Processing image with AI model</div>';const tips=[{type:'Curry / Turmeric',method:'Pre-treat with dish soap and baking soda paste. Wash at 40°C. Our enzyme wash removes it in one cycle.',service:'Wash & Care'},{type:'Oil / Grease',method:'Apply cornstarch, wait 30 min, brush off. Follow with dish soap before washing.',service:'Wash & Fold'},{type:'Ink / Pen',method:'Dab with isopropyl alcohol — do not rub. Our dry-cleaning solvent treatment is 95% effective.',service:'Dry Clean'},{type:'Sweat Stains',method:'Soak in white vinegar 30 min before washing. Cold water only. Our enzyme treatment removes buildup permanently.',service:'Wash & Iron'}];setTimeout(()=>{const t=tips[Math.floor(Math.random()*tips.length)];res.innerHTML=`<div style="font-weight:700;font-size:14.5px;margin-bottom:8px">✦ Detected: ${t.type}</div><div style="font-size:13px;color:var(--gray);margin-bottom:13px;line-height:1.6">${t.method}</div><div style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap"><span style="background:var(--white);color:var(--green);padding:4px 13px;border-radius:20px;font-size:12px;font-weight:700;border:1.5px solid var(--green)">Recommended: ${t.service}</span><button class="btn btn-p btn-sm" onclick="showSection('place-order')">Book Now →</button></div>`;},2000);}
+
+function toggleFAQ(el){const o=el.classList.contains('open');document.querySelectorAll('.faq-item').forEach(f=>f.classList.remove('open'));if(!o)el.classList.add('open');}
+
+function loadProfileData(){const u=JSON.parse(localStorage.getItem('kc_user')||'{}');const name=u.username||u.name||'—';document.getElementById('profileName').textContent=name;document.getElementById('profileEmail').textContent=u.email||'—';document.getElementById('profileAvatar').textContent=name[0]?.toUpperCase()||'?';document.getElementById('editName').value=name!=='—'?name:'';document.getElementById('editPhone').value=u.phone||'';document.getElementById('editAddress').value=u.address||'';}
+async function updateProfile(){try{await Auth.update({phone:document.getElementById('editPhone').value,address:document.getElementById('editAddress').value});toast('Profile updated successfully!','success');const u=JSON.parse(localStorage.getItem('kc_user')||'{}');u.phone=document.getElementById('editPhone').value;u.address=document.getElementById('editAddress').value;localStorage.setItem('kc_user',JSON.stringify(u));}catch(e){toast('Update failed.','error');}}
+function logout(){Auth.logout();}
+
+const KB={track:'Check "My Orders" for real-time status — pickup → washing → ironing → delivered.',price:'Pricing: Wash & Fold ₹40/kg, Wash & Iron ₹55/kg, Dry Clean ₹120/piece, Heritage Care ₹200/piece. Members save 10–20%.',student:'Students get a permanent 15% discount. Go to "Student Discount" in the menu and upload your college ID. Approved within 24 hours.',membership:'Plans: Free (basic), Silver ₹199/mo (10% off), Gold ₹399/mo (20% off + Heritage Care free). Upgrade in Membership Plans.',delivery:'Free doorstep pickup and delivery on all orders. Choose your preferred time slot at checkout.',heritage:'Heritage Care is our premium manual service for heirloom fabrics — Banarasi sarees, embroidered sherwanis, vintage pieces. Hand-washed, no machines.',payment:'We accept Razorpay (cards/net banking), UPI (GPay, PhonePe), and Cash on Delivery.',stain:'Upload a photo in the Vastra AI section and our AI will identify the stain and recommend the best treatment.',cancel:'Cancel before pickup — contact our support via WhatsApp for a full refund.',express:'24-hour express delivery available for Gold members.'};
+
+function initChat(){addBotMsg("Hello! I'm Vastra, your fabric care AI. How can I help you today?",['Track order','Pricing','Student discount','Heritage Care']);}
+function addBotMsg(text,qr=[]){const msgs=document.getElementById('chatMessages');const time=new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});const qrHtml=qr.length?`<div class="chat-qr">${qr.map(r=>`<button class="qr-btn" onclick="quickReply('${r}')">${r}</button>`).join('')}</div>`:'';msgs.innerHTML+=`<div class="msg bot"><div class="mb">${text}</div>${qrHtml}<div class="mt">${time}</div></div>`;msgs.scrollTop=msgs.scrollHeight;}
+function addUserMsg(text){const msgs=document.getElementById('chatMessages');const time=new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});msgs.innerHTML+=`<div class="msg user"><div class="mb">${text}</div><div class="mt">${time}</div></div>`;msgs.scrollTop=msgs.scrollHeight;}
+function quickReply(text){document.getElementById('chatInput').value=text;sendChat();}
+function sendChat(){const input=document.getElementById('chatInput');const text=input.value.trim();if(!text)return;addUserMsg(text);input.value='';const lower=text.toLowerCase();let resp="I can help with order tracking, pricing, student discount, membership, Heritage Care, payments, or stain advice.";for(const[k,v]of Object.entries(KB)){if(lower.includes(k)){resp=v;break;}}setTimeout(()=>addBotMsg(resp),650);}
+function toggleChat(){document.getElementById('chatbot-window').classList.toggle('open');}
+</script>
+</body>
+</html>

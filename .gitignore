@@ -1,0 +1,19 @@
+# Python Virtual Environments
+.venv/
+venv/
+env/
+
+# Database files
+*.db
+kapdacare.db
+kapda_care_backend/instance/
+
+# Secrets and Environment Variables
+.env
+
+# Python Cache
+__pycache__/
+*.pyc
+
+
+

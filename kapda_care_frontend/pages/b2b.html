@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>B2B Partnership — Kapda Care</title>
+  <link rel="stylesheet" href="../css/style.css"/>
+</head>
+<body>
+<nav class="navbar">
+  <a href="../index.html" class="nav-brand"><div class="nav-logo">KC</div> Kapda Care</a>
+  <div class="nav-actions">
+    <a href="login.html" class="btn btn-outline btn-sm">Login</a>
+    <a href="signup.html" class="btn btn-primary btn-sm">Sign Up</a>
+  </div>
+</nav>
+
+<section style="background:var(--green);padding:80px 5%;text-align:center">
+  <div class="section-tag" style="background:rgba(255,255,255,0.2);color:#fff;margin-bottom:20px">For Businesses</div>
+  <h1 style="color:#fff;font-size:clamp(32px,5vw,56px);font-weight:900;margin-bottom:16px">Kapda Care for Your Organization</h1>
+  <p style="color:rgba(255,255,255,0.85);font-size:18px;max-width:600px;margin:0 auto 32px">Bulk laundry and tailoring solutions for hostels, PGs, offices, hotels, and universities. Volume discounts, monthly billing, dedicated support.</p>
+</section>
+
+<section class="section" style="background:var(--white)">
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:24px;max-width:900px;margin:0 auto 60px">
+    <div class="service-card" style="text-align:center"><div class="service-icon">🏫</div><div class="service-name">Universities & Colleges</div><div class="service-desc">Student hostel laundry management</div></div>
+    <div class="service-card" style="text-align:center"><div class="service-icon">🏢</div><div class="service-name">Corporate Offices</div><div class="service-desc">Employee uniform & formal wear care</div></div>
+    <div class="service-card" style="text-align:center"><div class="service-icon">🏠</div><div class="service-name">PGs & Hostels</div><div class="service-desc">Weekly bulk laundry contracts</div></div>
+    <div class="service-card" style="text-align:center"><div class="service-icon">🏨</div><div class="service-name">Hotels & Resorts</div><div class="service-desc">Linen, towel & uniform cleaning</div></div>
+  </div>
+
+  <div style="max-width:680px;margin:0 auto">
+    <h2 style="text-align:center;margin-bottom:32px;font-size:32px">Apply for B2B Account</h2>
+
+    <div id="successMsg" style="display:none;background:var(--green-light);border-radius:var(--radius);padding:28px;text-align:center;margin-bottom:24px">
+      <div style="font-size:48px;margin-bottom:12px">🎉</div>
+      <div style="font-size:20px;font-weight:700;margin-bottom:8px">Application Submitted!</div>
+      <div style="color:var(--gray)">Our B2B team will contact you within 24 hours with a custom pricing proposal.</div>
+    </div>
+
+    <div id="b2bForm">
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">Organization Name</label><input type="text" id="orgName" class="form-input" placeholder="ABC University"/></div>
+        <div class="form-group"><label class="form-label">Organization Type</label>
+          <select id="orgType" class="form-input form-select">
+            <option>University / College</option><option>PG / Hostel</option><option>Corporate Office</option><option>Hotel / Resort</option><option>Other</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">Contact Person Name</label><input type="text" id="contactName" class="form-input" placeholder="Raj Kumar"/></div>
+        <div class="form-group"><label class="form-label">Designation</label><input type="text" id="designation" class="form-input" placeholder="Manager / Warden"/></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">Email Address</label><input type="email" id="b2bEmail" class="form-input" placeholder="contact@abc.edu"/></div>
+        <div class="form-group"><label class="form-label">Phone Number</label><input type="tel" id="b2bPhone" class="form-input" placeholder="9876543210"/></div>
+      </div>
+      <div class="form-group"><label class="form-label">Organization Address</label><input type="text" id="b2bAddress" class="form-input" placeholder="Full address..."/></div>
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">Estimated Items/Month</label>
+          <select id="volume" class="form-input form-select">
+            <option>50–200 items</option><option>200–500 items</option><option>500–1000 items</option><option>1000+ items</option>
+          </select>
+        </div>
+        <div class="form-group"><label class="form-label">Services Needed</label>
+          <select id="services" class="form-input form-select">
+            <option>Laundry Only</option><option>Tailoring Only</option><option>Both Laundry & Tailoring</option><option>All Services</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group"><label class="form-label">Additional Requirements</label><input type="text" id="requirements" class="form-input" placeholder="Any special requirements..."/></div>
+
+      <div style="background:var(--green-light);border-radius:var(--radius);padding:16px;margin-bottom:20px">
+        <div style="font-weight:700;margin-bottom:8px">B2B Benefits You'll Get:</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;font-size:14px">
+          <div>✓ Up to 30% volume discount</div><div>✓ Monthly invoice & GST bill</div>
+          <div>✓ Dedicated account manager</div><div>✓ Priority pickup slots</div>
+          <div>✓ Custom branded bags</div><div>✓ Real-time tracking dashboard</div>
+        </div>
+      </div>
+
+      <button class="btn btn-primary btn-full" id="b2bSubmitBtn" onclick="submitB2B()" style="padding:15px;font-size:16px">Submit B2B Application →</button>
+    </div>
+  </div>
+</section>
+
+<footer style="background:var(--black);color:rgba(255,255,255,0.7);padding:32px 5%;text-align:center">
+  <div style="font-size:18px;font-weight:700;color:#fff;margin-bottom:6px">Kapda Care</div>
+  <p style="font-size:13px">© 2025 Kapda Care. Made with ❤️ in India</p>
+</footer>
+
+<div class="toast" id="toast"></div>
+<script src="../js/api.js"></script>
+<script>
+function showToast(msg,type=''){const t=document.getElementById('toast');t.textContent=msg;t.className=`toast ${type} show`;setTimeout(()=>t.classList.remove('show'),3500);}
+
+async function submitB2B(){
+  const orgName=document.getElementById('orgName').value.trim();
+  const contactName=document.getElementById('contactName').value.trim();
+  const email=document.getElementById('b2bEmail').value.trim();
+  const phone=document.getElementById('b2bPhone').value.trim();
+  if(!orgName||!contactName||!email||!phone){showToast('Please fill all required fields.','error');return;}
+  const btn=document.getElementById('b2bSubmitBtn');
+  btn.disabled=true;btn.textContent='Submitting...';
+  await new Promise(r=>setTimeout(r,1500));
+  document.getElementById('b2bForm').style.display='none';
+  document.getElementById('successMsg').style.display='block';
+}
+</script>
+</body>
+</html>

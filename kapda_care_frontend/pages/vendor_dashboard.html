@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>Vendor Dashboard — Kapda Care</title>
+  <link rel="stylesheet" href="../css/style.css"/>
+</head>
+<body>
+<div class="dash-layout">
+  <aside class="sidebar">
+    <div class="sidebar-brand">
+      <div class="nav-brand"><div class="nav-logo">KC</div> Kapda Care</div>
+      <div style="margin-top:8px"><span class="badge badge-active" id="roleTag">Vendor</span></div>
+    </div>
+    <nav class="sidebar-nav">
+      <a href="#" class="active" onclick="showTab('dashboard',this)"><span class="nav-icon">📊</span> Dashboard</a>
+      <a href="#" onclick="showTab('orders',this)"><span class="nav-icon">📦</span> All Orders</a>
+      <a href="#" onclick="showTab('users',this)" id="adminUsersLink" style="display:none"><span class="nav-icon">👥</span> Users</a>
+      <a href="#" onclick="showTab('analytics',this)" id="adminAnalLink" style="display:none"><span class="nav-icon">📈</span> Analytics</a>
+    </nav>
+    <div class="sidebar-footer">
+      <button class="btn btn-outline btn-sm btn-full" onclick="Auth.logout()">Logout</button>
+    </div>
+  </aside>
+
+  <main class="dash-main">
+
+    <div id="tab-dashboard">
+      <div class="dash-header">
+        <div><div class="dash-title" id="vendorGreet">Vendor Panel</div><div class="dash-greeting">Manage today's orders</div></div>
+        <button class="btn btn-primary" onclick="loadDashboard()">🔄 Refresh</button>
+      </div>
+      <div class="stats-grid" id="dashStats"><div class="spinner"></div></div>
+    </div>
+
+    <div id="tab-orders" style="display:none">
+      <div class="dash-header">
+        <div class="dash-title">All Orders</div>
+        <select class="form-input form-select" id="statusFilter" onchange="loadOrders(this.value)" style="width:190px;font-size:14px">
+          <option value="">All Status</option>
+          <option value="pending">Pending</option>
+          <option value="assigned">Assigned</option>
+          <option value="picked_up">Picked Up</option>
+          <option value="at_partner">At Partner</option>
+          <option value="qc_check">QC Check</option>
+          <option value="out_for_delivery">Out for Delivery</option>
+          <option value="delivered">Delivered</option>
+        </select>
+      </div>
+      <div class="card">
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Order ID</th><th>Customer</th><th>Items</th><th>Amount</th><th>Status</th><th>Date</th><th>Action</th></tr></thead>
+            <tbody id="ordersTable"><tr><td colspan="7" style="text-align:center;padding:40px"><div class="spinner"></div></td></tr></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <div id="tab-users" style="display:none">
+      <div class="dash-header"><div class="dash-title">All Users</div></div>
+      <div class="card">
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Name</th><th>Email</th><th>Phone</th><th>Role</th><th>Joined</th><th>Actions</th></tr></thead>
+            <tbody id="usersTable"><tr><td colspan="6" style="text-align:center;padding:40px"><div class="spinner"></div></td></tr></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <div id="tab-analytics" style="display:none">
+      <div class="dash-header"><div class="dash-title">Analytics</div></div>
+      <div id="analyticsContent"><div class="spinner"></div></div>
+    </div>
+
+  </main>
+</div>
+
+<!-- STATUS MODAL -->
+<div class="modal-overlay" id="statusModal">
+  <div class="modal-box">
+    <button class="modal-close" onclick="closeModal()">✕</button>
+    <h3 class="modal-title">Update Order Status</h3>
+    <p style="color:var(--gray);margin-bottom:20px" id="modalOrderId"></p>
+    <div class="form-group">
+      <label class="form-label">New Status</label>
+      <select class="form-input form-select" id="newStatus">
+        <option value="assigned">Assigned to Agent</option>
+        <option value="picked_up">Picked Up</option>
+        <option value="at_partner">At Partner (Dhobi/Darzi)</option>
+        <option value="qc_check">Quality Check</option>
+        <option value="out_for_delivery">Out for Delivery</option>
+        <option value="delivered">Delivered ✓</option>
+        <option value="cancelled">Cancelled</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Message to Customer (optional)</label>
+      <input type="text" class="form-input" id="statusMsg" placeholder="e.g. Your clothes are with the tailor..."/>
+    </div>
+    <button class="btn btn-primary btn-full" onclick="submitStatus()">Update Status</button>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="../js/api.js"></script>
+<script>
+requireVendor();
+const me=getUser();
+let currentOrderId=null;
+
+if(me) {
+  document.getElementById('vendorGreet').textContent=`Welcome, ${me.username}! 👋`;
+  if(me.role==='admin') {
+    document.getElementById('roleTag').textContent='Admin';
+    document.getElementById('adminUsersLink').style.display='flex';
+    document.getElementById('adminAnalLink').style.display='flex';
+  }
+}
+
+function showToast(msg,type=''){const t=document.getElementById('toast');t.textContent=msg;t.className=`toast ${type} show`;setTimeout(()=>t.classList.remove('show'),3500);}
+function getBadge(s){const m={pending:'badge-pending',assigned:'badge-active',picked_up:'badge-active',at_partner:'badge-active',qc_check:'badge-active',out_for_delivery:'badge-active',delivered:'badge-done',cancelled:'badge-cancelled'};return `<span class="badge ${m[s]||'badge-pending'}">${s.replace(/_/g,' ')}</span>`;}
+
+function showTab(name,el) {
+  document.querySelectorAll('[id^="tab-"]').forEach(t=>t.style.display='none');
+  document.getElementById('tab-'+name).style.display='block';
+  document.querySelectorAll('.sidebar-nav a').forEach(a=>a.classList.remove('active'));
+  if(el) el.classList.add('active');
+  if(name==='dashboard') loadDashboard();
+  if(name==='orders')    loadOrders();
+  if(name==='users')     loadUsers();
+  if(name==='analytics') loadAnalytics();
+}
+
+async function loadDashboard(){
+  try{
+    const d=await Vendor.dashboard();
+    document.getElementById('dashStats').innerHTML=`
+      <div class="stat-card"><div class="stat-card-num">${d.total_orders}</div><div class="stat-card-label">Total Orders</div></div>
+      <div class="stat-card"><div class="stat-card-num">${d.pending_orders}</div><div class="stat-card-label">Pending</div></div>
+      <div class="stat-card"><div class="stat-card-num">${d.delivered_orders}</div><div class="stat-card-label">Delivered</div></div>
+      <div class="stat-card"><div class="stat-card-num">${d.today_orders}</div><div class="stat-card-label">Today</div></div>
+      <div class="stat-card"><div class="stat-card-num" style="color:var(--green)">₹${d.total_revenue}</div><div class="stat-card-label">Revenue</div></div>`;
+  }catch(e){showToast(e.message,'error');}
+}
+
+async function loadOrders(status=''){
+  const tb=document.getElementById('ordersTable');
+  tb.innerHTML='<tr><td colspan="7" style="text-align:center;padding:40px"><div class="spinner"></div></td></tr>';
+  try{
+    const data=await Vendor.allOrders(status);
+    const orders=data.orders||data;
+    if(!orders.length){tb.innerHTML='<tr><td colspan="7" style="text-align:center;padding:40px;color:var(--gray)">No orders found</td></tr>';return;}
+    tb.innerHTML=orders.map(o=>{
+      const items=typeof o.items==='string'?JSON.parse(o.items||'[]'):o.items||[];
+      return `<tr>
+        <td style="font-weight:700">#KC-${String(o.id).padStart(4,'0')}</td>
+        <td>#${o.customer_id}</td>
+        <td>${items.length} item(s)</td>
+        <td style="font-weight:700;color:var(--green)">₹${o.final_price}</td>
+        <td>${getBadge(o.status)}</td>
+        <td>${new Date(o.created_at).toLocaleDateString('en-IN')}</td>
+        <td><button class="btn btn-sm btn-primary" onclick="openStatusModal(${o.id})">Update</button></td>
+      </tr>`;}).join('');
+  }catch(e){showToast(e.message,'error');}
+}
+
+function openStatusModal(id){
+  currentOrderId=id;
+  document.getElementById('modalOrderId').textContent=`Order #KC-${String(id).padStart(4,'0')}`;
+  document.getElementById('statusModal').classList.add('show');
+}
+
+async function submitStatus(){
+  const status=document.getElementById('newStatus').value;
+  const message=document.getElementById('statusMsg').value;
+  try{
+    await Vendor.updateStatus(currentOrderId,{status,message});
+    showToast('Status updated successfully!','success');
+    closeModal(); loadOrders(document.getElementById('statusFilter').value);
+  }catch(e){showToast(e.message,'error');}
+}
+
+function closeModal(){document.getElementById('statusModal').classList.remove('show');currentOrderId=null;}
+document.getElementById('statusModal').addEventListener('click',e=>{if(e.target===e.currentTarget)closeModal();});
+
+async function loadUsers(){
+  const tb=document.getElementById('usersTable');
+  try{
+    const users=await Admin.users();
+    tb.innerHTML=users.map(u=>`<tr>
+      <td style="font-weight:600">${u.username}</td>
+      <td>${u.email}</td>
+      <td>${u.phone||'—'}</td>
+      <td>${getBadge(u.role==='admin'?'delivered':u.role==='vendor'?'active':'pending')} ${u.role}</td>
+      <td>${new Date(u.created_at).toLocaleDateString('en-IN')}</td>
+      <td style="display:flex;gap:6px">
+        <button class="btn btn-sm btn-outline" onclick="changeRole(${u.id})">Role</button>
+        <button class="btn btn-sm btn-danger" onclick="toggleUser(${u.id})">${u.is_active?'Ban':'Unban'}</button>
+      </td></tr>`).join('');
+  }catch(e){showToast(e.message,'error');}
+}
+
+async function changeRole(id){
+  const role=prompt('New role:\ncustomer / vendor / admin');
+  if(!role) return;
+  try{await Admin.changeRole(id,{role});showToast('Role updated!','success');loadUsers();}
+  catch(e){showToast(e.message,'error');}
+}
+
+async function toggleUser(id){
+  try{await Admin.toggleUser(id);showToast('User status updated!','success');loadUsers();}
+  catch(e){showToast(e.message,'error');}
+}
+
+async function loadAnalytics(){
+  try{
+    const d=await Admin.analytics();
+    document.getElementById('analyticsContent').innerHTML=`
+      <div class="stats-grid">
+        <div class="stat-card"><div class="stat-card-num">${d.users.total}</div><div class="stat-card-label">Total Users</div></div>
+        <div class="stat-card"><div class="stat-card-num">${d.users.customers}</div><div class="stat-card-label">Customers</div></div>
+        <div class="stat-card"><div class="stat-card-num">${d.users.vendors}</div><div class="stat-card-label">Vendors</div></div>
+        <div class="stat-card"><div class="stat-card-num">${d.orders.total}</div><div class="stat-card-label">Total Orders</div></div>
+        <div class="stat-card"><div class="stat-card-num">${d.orders.delivered}</div><div class="stat-card-label">Delivered</div></div>
+        <div class="stat-card"><div class="stat-card-num" style="color:var(--green)">₹${d.revenue.total}</div><div class="stat-card-label">Revenue</div></div>
+      </div>`;
+  }catch(e){showToast(e.message,'error');}
+}
+
+loadDashboard();
+</script>
+</body>
+</html>

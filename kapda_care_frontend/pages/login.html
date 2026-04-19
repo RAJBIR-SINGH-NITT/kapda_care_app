@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>Login — Kapda Care</title>
+  <link rel="stylesheet" href="../css/style.css"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+</head>
+<body>
+<div class="auth-layout">
+  <div class="auth-left">
+    <a href="../index.html" style="display:flex;align-items:center;gap:10px;margin-bottom:56px;color:#fff;text-decoration:none;">
+      <div class="nav-logo">KC</div><span style="font-size:18px;font-weight:700">Kapda Care</span>
+    </a>
+    <h2 class="auth-left-title">Welcome back to your fabric OS.</h2>
+    <p class="auth-left-desc">Your clothes, your orders, your partners — all in one place.</p>
+    
+    <div class="auth-feature">
+      <div class="auth-feature-icon"><i class="fa-solid fa-basket-shopping"></i></div>
+      <div>One pickup for all services</div>
+    </div>
+    
+    <div class="auth-feature">
+      <div class="auth-feature-icon"><i class="fa-solid fa-bolt" style="color: #f59e0b;"></i></div>
+      <div>24-hour express delivery</div>
+    </div>
+    
+    <div class="auth-feature">
+      <div class="auth-feature-icon"><i class="fa-solid fa-circle-check" style="color: #10b981;"></i></div>
+      <div>Quality check guaranteed</div>
+    </div>
+    
+    <div class="auth-feature">
+      <div class="auth-feature-icon"><i class="fa-solid fa-location-dot"></i></div>
+      <div>Real-time order tracking</div>
+    </div>
+    
+    <div style="margin-top:auto;padding-top:40px;font-size:13px;opacity:0.5">© 2026 Kapda Care</div>
+  </div>
+
+  <div class="auth-right">
+    <div class="auth-form">
+      <h1 class="auth-title">Sign in</h1>
+      <p class="auth-sub">Don't have an account? <a href="signup.html">Create one free <i class="fa-solid fa-arrow-right" style="margin-left: 4px; font-size: 0.9em;"></i></a></p>
+
+      <div id="errorBox" style="display:none;background:#fee2e2;color:#991b1b;padding:12px 16px;border-radius:10px;font-size:14px;margin-bottom:20px">
+        <i class="fa-solid fa-circle-exclamation" style="margin-right: 6px;"></i><span id="errorText"></span>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label"><i class="fa-solid fa-envelope" style="margin-right: 6px; color: var(--gray);"></i>Email Address</label>
+        <input type="email" id="email" class="form-input" placeholder="you@gmail.com"/>
+      </div>
+      <div class="form-group">
+        <label class="form-label"><i class="fa-solid fa-lock" style="margin-right: 6px; color: var(--gray);"></i>Password</label>
+        <input type="password" id="password" class="form-input" placeholder="Your password"/>
+      </div>
+
+      <button class="btn btn-primary btn-full" id="loginBtn" style="padding:15px;font-size:16px;margin-top:4px">
+        Sign In <i class="fa-solid fa-arrow-right-to-bracket" style="margin-left: 6px;"></i>
+      </button>
+
+      <div class="form-divider">or</div>
+
+      <a href="signup.html?role=vendor" class="btn btn-outline btn-full" style="margin-bottom:12px; display:flex; justify-content:center; align-items:center; gap:8px;">
+        <i class="fa-solid fa-scissors" style="color: var(--gray);"></i> Join as Dhobi / Tailor Partner
+      </a>
+
+      <p style="text-align:center;font-size:13px;color:var(--gray);margin-top:8px">
+        Are you a business? <a href="b2b.html" style="color:var(--green);font-weight:600">B2B Enquiry <i class="fa-solid fa-arrow-right" style="margin-left: 2px; font-size: 0.9em;"></i></a>
+      </p>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="../js/api.js"></script>
+<script>
+  // Already logged in? Redirect
+  if (getToken()) {
+    const u = getUser();
+    window.location.href = u && ['vendor','admin'].includes(u.role) ? 'vendor-dashboard.html' : 'dashboard.html';
+  }
+
+  function showError(msg) {
+    const box = document.getElementById('errorBox');
+    const text = document.getElementById('errorText');
+    text.textContent = msg;
+    box.style.display = 'block';
+  }
+  function hideError() { document.getElementById('errorBox').style.display = 'none'; }
+
+  document.getElementById('loginBtn').addEventListener('click', handleLogin);
+  document.addEventListener('keydown', e => { if(e.key==='Enter') handleLogin(); });
+
+  async function handleLogin() {
+    hideError();
+    const email    = document.getElementById('email').value.trim();
+    const password = document.getElementById('password').value;
+    const btn      = document.getElementById('loginBtn');
+
+    if (!email || !password) { showError('Please enter your email and password.'); return; }
+
+    btn.disabled = true;
+    btn.innerHTML = 'Signing in... <i class="fa-solid fa-spinner fa-spin" style="margin-left: 6px;"></i>';
+
+    try {
+      const data = await Auth.login({ email, password });
+      localStorage.setItem('kc_token', data.access_token);
+      localStorage.setItem('kc_user',  JSON.stringify(data.user));
+      window.location.href = ['vendor','admin'].includes(data.user.role) ? 'vendor-dashboard.html' : 'dashboard.html';
+    } catch(err) {
+      showError(err.message);
+      btn.disabled = false;
+      btn.innerHTML = 'Sign In <i class="fa-solid fa-arrow-right-to-bracket" style="margin-left: 6px;"></i>';
+    }
+  }
+</script>
+</body>
+</html>
